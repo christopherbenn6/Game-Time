@@ -1005,31 +1005,51 @@ const safeHTML = document.querySelector('#num');
 
 let totalCount = 0;
 let safeCount = 0;
-data.forEach((set) => {
-    totalCount++;
 
-    let isSafe = true;
+function isSafe (set) {
     let dataArray = set.split(" ");
     let sorted = set.split(" ").sort((a, b) => a - b);
-
+    
     // Is the ordering all sorted properly?
-    if(sorted.join("") !== dataArray.join("") && sorted.slice().reverse().join("") !== dataArray.join("")) {
-        isSafe = false;
+    if(sorted.join(" ") !== dataArray.join(" ") && sorted.slice().reverse().join(" ") !== dataArray.join(" ")) {
+        return false;
     }
 
     // Loop through every number in each set
-    for(i = 0; i < dataArray.length; i++) {
+    for(let i = 0; i < dataArray.length; i++) {
         let number = dataArray[i];
 
         // Check if not first number
         if(i - 1 >= 0) {
-            if((Math.abs(dataArray[i] - dataArray[i - 1] ) > 3)) {
-                isSafe = false;
+            if((Math.abs(dataArray[i] - dataArray[i - 1] ) > 3) || Math.abs(dataArray[i] - dataArray[i - 1]) == 0) {
+                return false;
             }
         }
     }
 
-    if(isSafe) {
+    return true;
+}
+
+function isSafeWithDampener(set) {
+    let dataArray = set.split(" ");
+    let sorted = set.split(" ").sort((a, b) => a - b);
+
+    for(let i = 0; i < dataArray.length; i++) {
+        let newArray = dataArray.slice(0, i).concat(dataArray.slice(i + 1));
+        if(isSafe(newArray.join(" "))) {
+            return true;
+        } 
+    }
+
+    return false;
+}
+
+data.forEach((set) => {
+    totalCount++;
+
+    if(isSafe(set)) {
+        safeCount++;
+    } else if (isSafeWithDampener(set)) {
         safeCount++;
     }
 });
